@@ -8,17 +8,32 @@ import EditItem from "../Items/EditItem"
 
 interface ItemActionsMenuProps {
   item: ItemPublic
+  inModal?: boolean
 }
 
-export const ItemActionsMenu = ({ item }: ItemActionsMenuProps) => {
+export const ItemActionsMenu = ({ item, inModal = false }: ItemActionsMenuProps) => {
   return (
     <MenuRoot>
       <MenuTrigger asChild>
-        <IconButton variant="ghost" color="inherit">
+        <IconButton 
+          variant="ghost" 
+          size="sm"
+          color="gray.600"
+          bg="white"
+          _hover={{ 
+            bg: "gray.100",
+            color: "gray.800"
+          }}
+          borderRadius="full"
+          shadow="sm"
+        >
           <BsThreeDotsVertical />
         </IconButton>
       </MenuTrigger>
-      <MenuContent>
+      <MenuContent 
+        portalled={!inModal} 
+        zIndex={inModal ? "dropdown" : "auto"}
+      >
         <EditItem item={item} />
         <DeleteItem id={item.id} />
       </MenuContent>
