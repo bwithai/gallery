@@ -224,181 +224,290 @@ function ImageGallery() {
         size="full"
         placement="center"
       >
-        <DialogContent maxW="95vw" maxH="95vh" bg="white" borderRadius="3xl" overflow="hidden">
+        <DialogContent maxW="95vw" maxH="95vh" bg="white" borderRadius="3xl" overflow="auto">
           <DialogCloseTrigger 
-            position="absolute"
-            top="4"
-            right="4"
+            position="fixed"
+            top="6"
+            right="6"
             bg="white" 
             borderRadius="full" 
             _hover={{ bg: "gray.100" }}
             zIndex="overlay"
+            shadow="lg"
           />
           
           {selectedItem && (
-            <Flex direction={{ base: "column", lg: "row" }} h="95vh" maxH="95vh">
-              {/* Left half - Image and its details */}
-              <Box w={{ base: "full", lg: "50%" }} p={6} overflowY="auto" maxH="100%">
-                <VStack align="start" gap={6}>
-                  {/* Main image */}
-                  <Box w="full" display="flex" alignItems="center" justifyContent="center" bg="gray.50" borderRadius="xl" p={4}>
-                    <AuthenticatedImage
-                      src={`/api/v1/items/${selectedItem.id}/image`}
-                      alt={selectedItem.alt_text || selectedItem.title}
-                      objectFit="contain"
-                      maxW="full"
-                      maxH="60vh"
-                      borderRadius="lg"
-                    />
-                  </Box>
+            <Box minH="95vh" overflowY="auto" p={6}>
+              {/* Layout with large main image and masonry grid */}
+              <Box maxW="7xl" mx="auto">
+                {/* Large main image positioned in upper left, taking about half screen */}
+                {(() => {
+                  const aspectRatio = selectedItem.width && selectedItem.height 
+                    ? selectedItem.width / selectedItem.height : 1
                   
-                  {/* Image details below the image */}
-                  <Box w="full">
-                    <Heading size="xl" mb={3} color="gray.800">
-                      {selectedItem.title}
-                    </Heading>
-                    {selectedItem.description && (
-                      <Text color="gray.600" mb={4} fontSize="md" lineHeight="1.6">
-                        {selectedItem.description}
-                      </Text>
-                    )}
-                    
-                    <Flex gap={6} fontSize="sm" color="gray.500" wrap="wrap">
-                      <Text fontWeight="medium">{selectedItem.width} × {selectedItem.height}</Text>
-                      <Text fontWeight="medium">{selectedItem.mime_type}</Text>
-                      <Text fontWeight="medium">{new Date(selectedItem.upload_date).toLocaleDateString()}</Text>
-                    </Flex>
-                  </Box>
-                </VStack>
-              </Box>
-              
-              {/* Right half - All Related images (scrollable) */}
-              <Box w={{ base: "full", lg: "50%" }} bg="gray.50" display="flex" flexDirection="column" h="100%" maxH="100%">
-                {relatedData?.data && relatedData.data.length > 1 ? (
-                  <>
-                    {/* Header - fixed */}
-                    <Box p={6} pb={4} borderBottom="1px" borderColor="gray.200">
-                      <Heading size="lg" color="gray.800" mb={2}>
-                        More from this collection
-                      </Heading>
-                      <Text fontSize="sm" color="gray.600">
-                        {relatedData.data.length - 1} other images in this collection
-                      </Text>
-                    </Box>
-                    
-                    {/* Scrollable content area */}
-                    <Box flex="1" overflowY="auto" overflowX="hidden" p={6} pt={4} maxH="calc(100vh - 120px)">
-                      {/* Pinterest-style masonry grid for related images */}
+                  return (
+                    <Box
+                      key={`main-${selectedItem.id}`}
+                      bg="white"
+                      borderRadius="3xl"
+                      overflow="hidden"
+                      mb={8}
+                      shadow="2xl"
+                      border="4px solid"
+                      borderColor="blue.400"
+                      position="relative"
+                      w={{ base: "full", md: "65%", lg: "55%" }}
+                      float={{ base: "none", md: "left" }}
+                      mr={{ base: 0, md: 6 }}
+                      mb={{ base: 8, md: 6 }}
+                    >
+                      {/* Large main image */}
+                      <AuthenticatedImage
+                        src={`/api/v1/items/${selectedItem.id}/image`}
+                        alt={selectedItem.alt_text || selectedItem.title}
+                        objectFit="cover"
+                        w="full"
+                        h={{ base: "60vh", md: "70vh", lg: "75vh" }}
+                        fallback={
+                          <Box
+                            bg="gray.200"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            w="full"
+                            h={{ base: "60vh", md: "70vh", lg: "75vh" }}
+                          >
+                            <FiImage size="96" color="gray.400" />
+                          </Box>
+                        }
+                      />
+                      
+                      {/* Pinterest-style overlay with details */}
                       <Box
-                        css={{
-                          columnCount: { base: 1, md: 2 },
-                          columnGap: '1rem',
-                          columnFill: 'balance',
-                        }}
+                        position="absolute"
+                        bottom="0"
+                        left="0"
+                        right="0"
+                        bg="linear-gradient(transparent, rgba(0,0,0,0.85))"
+                        p={6}
+                        color="white"
                       >
-                        {relatedData.data
-                          .filter(relatedItem => relatedItem.id !== selectedItem.id)
-                          .map((relatedItem) => {
-                            // Calculate display height based on actual aspect ratio
-                            const aspectRatio = relatedItem.width && relatedItem.height 
-                              ? relatedItem.width / relatedItem.height : 1
-                            const baseWidth = 280 // Smaller base width for modal
-                            const calculatedHeight = Math.round(baseWidth / aspectRatio)
-                            
-                            return (
-                              <Box
-                                key={relatedItem.id}
-                                borderRadius="2xl"
-                                overflow="hidden"
-                                mb={4}
-                                breakInside="avoid"
-                                cursor="pointer"
-                                transition="all 0.3s ease"
-                                shadow="md"
-                                position="relative"
-                                _hover={{ 
-                                  transform: "scale(1.04)",
-                                  shadow: "lg",
-                                  filter: "brightness(0.98)",
-                                  "& .related-action-menu": {
-                                    opacity: 1,
-                                    visibility: "visible"
-                                  }
-                                }}
-                                css={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
-                                onClick={() => setSelectedItem(relatedItem)}
-                              >
-                                <AuthenticatedImage
-                                  src={`/api/v1/items/${relatedItem.id}/image`}
-                                  alt={relatedItem.alt_text || relatedItem.title}
-                                  objectFit="cover"
+                        <Heading size="lg" mb={3} textShadow="0 2px 4px rgba(0,0,0,0.7)">
+                          {selectedItem.title}
+                        </Heading>
+                        {selectedItem.description && (
+                          <Text 
+                            fontSize="md" 
+                            mb={4} 
+                            noOfLines={4}
+                            textShadow="0 1px 3px rgba(0,0,0,0.7)"
+                            lineHeight="1.5"
+                          >
+                            {selectedItem.description}
+                          </Text>
+                        )}
+                        <Flex gap={6} fontSize="sm" opacity={0.95} wrap="wrap">
+                          <Text fontWeight="medium">{selectedItem.width} × {selectedItem.height}</Text>
+                          <Text fontWeight="medium">{selectedItem.mime_type}</Text>
+                          <Text fontWeight="medium">{new Date(selectedItem.upload_date).toLocaleDateString()}</Text>
+                        </Flex>
+                      </Box>
+
+                      {/* "Currently Viewing" badge */}
+                      <Box
+                        position="absolute"
+                        top="4"
+                        left="4"
+                        bg="blue.500"
+                        color="white"
+                        px={4}
+                        py={2}
+                        borderRadius="full"
+                        fontSize="sm"
+                        fontWeight="bold"
+                        textTransform="uppercase"
+                        letterSpacing="wide"
+                        shadow="lg"
+                      >
+                        Now Viewing
+                      </Box>
+
+                      {/* Action Menu */}
+                      <Box
+                        position="absolute"
+                        top="4"
+                        right="4"
+                        bg="white"
+                        borderRadius="full"
+                        shadow="xl"
+                        p={2}
+                      >
+                        <ItemActionsMenu item={selectedItem} inModal={true} />
+                      </Box>
+                    </Box>
+                  )
+                })()}
+
+                {/* Related images masonry grid flowing around the main image */}
+                {relatedData?.data && relatedData.data.length > 1 && (
+                  <Box
+                    css={{
+                      columnCount: { base: 1, sm: 2, md: 2, lg: 3, xl: 4 },
+                      columnGap: '1.5rem',
+                      columnFill: 'balance',
+                    }}
+                  >
+                    {relatedData.data
+                      .filter(relatedItem => relatedItem.id !== selectedItem.id)
+                      .map((relatedItem) => {
+                        // Calculate display height based on actual aspect ratio - same as main gallery
+                        const aspectRatio = relatedItem.width && relatedItem.height 
+                          ? relatedItem.width / relatedItem.height : 1
+                        const baseWidth = 450 // Same as main gallery items
+                        const calculatedHeight = Math.round(baseWidth / aspectRatio)
+                        
+                        return (
+                          <Box
+                            key={relatedItem.id}
+                            bg="white"
+                            borderRadius="2xl"
+                            overflow="hidden"
+                            mb={6}
+                            breakInside="avoid"
+                            cursor="pointer"
+                            transition="all 0.3s ease"
+                            shadow="lg"
+                            position="relative"
+                            _hover={{ 
+                              transform: "scale(1.05)",
+                              shadow: "xl",
+                              "& .pinterest-overlay": {
+                                opacity: 1
+                              },
+                              "& .related-action-menu": {
+                                opacity: 1,
+                                visibility: "visible"
+                              }
+                            }}
+                            css={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+                            onClick={() => setSelectedItem(relatedItem)}
+                          >
+                            <AuthenticatedImage
+                              src={`/api/v1/items/${relatedItem.id}/image`}
+                              alt={relatedItem.alt_text || relatedItem.title}
+                              objectFit="cover"
+                              w="full"
+                              h={`${calculatedHeight}px`}
+                              fallback={
+                                <Box
+                                  bg="gray.200"
+                                  display="flex"
+                                  alignItems="center"
+                                  justifyContent="center"
                                   w="full"
                                   h={`${calculatedHeight}px`}
-                                  borderRadius="2xl"
-                                  fallback={
-                                    <Box
-                                      bg="gray.200"
-                                      display="flex"
-                                      alignItems="center"
-                                      justifyContent="center"
-                                      w="full"
-                                      h={`${calculatedHeight}px`}
-                                      borderRadius="2xl"
-                                    >
-                                      <FiImage size="32" color="gray.400" />
-                                    </Box>
-                                  }
-                                />
-                                
-                                {/* Action Menu Overlay for Related Images */}
-                                <Box
-                                  className="related-action-menu"
-                                  position="absolute"
-                                  bottom="3"
-                                  right="3"
-                                  opacity={0}
-                                  visibility="hidden"
-                                  transition="all 0.2s ease"
-                                  bg="white"
-                                  borderRadius="full"
-                                  shadow="lg"
-                                  p={1}
-                                  zIndex="dropdown"
-                                  onClick={(e) => {
-                                    e.stopPropagation() // Prevent switching to this image when clicking menu
-                                  }}
-                                  onMouseDown={(e) => {
-                                    e.stopPropagation() // Stop propagation on mouse down too
-                                  }}
-                                  onPointerDown={(e) => {
-                                    e.stopPropagation() // Stop propagation on pointer down
-                                  }}
                                 >
-                                  <ItemActionsMenu item={relatedItem} inModal={true} />
+                                  <FiImage size="48" color="gray.400" />
                                 </Box>
-                              </Box>
-                            )
-                          })}
-                      </Box>
-                      
-                      {/* Bottom spacing for better scroll experience */}
-                      <Box h={4} />
-                    </Box>
-                  </>
-                ) : (
-                  <Box display="flex" alignItems="center" justifyContent="center" h="full" p={6}>
+                              }
+                            />
+                            
+                            {/* Pinterest-style hover overlay */}
+                            <Box
+                              className="pinterest-overlay"
+                              position="absolute"
+                              top="0"
+                              left="0"
+                              right="0"
+                              bottom="0"
+                              bg="rgba(0,0,0,0.3)"
+                              opacity={0}
+                              transition="all 0.2s ease"
+                              display="flex"
+                              alignItems="flex-end"
+                              p={4}
+                            >
+                              <VStack align="start" gap={1} color="white" w="full">
+                                <Heading 
+                                  size="sm" 
+                                  noOfLines={2}
+                                  textShadow="0 1px 2px rgba(0,0,0,0.7)"
+                                >
+                                  {relatedItem.title}
+                                </Heading>
+                                {relatedItem.description && (
+                                  <Text 
+                                    fontSize="xs" 
+                                    noOfLines={2}
+                                    textShadow="0 1px 2px rgba(0,0,0,0.7)"
+                                  >
+                                    {relatedItem.description}
+                                  </Text>
+                                )}
+                              </VStack>
+                            </Box>
+                            
+                            {/* Action Menu Overlay */}
+                            <Box
+                              className="related-action-menu"
+                              position="absolute"
+                              top="3"
+                              right="3"
+                              opacity={0}
+                              visibility="hidden"
+                              transition="all 0.2s ease"
+                              bg="white"
+                              borderRadius="full"
+                              shadow="lg"
+                              p={1}
+                              zIndex="dropdown"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                              }}
+                              onMouseDown={(e) => {
+                                e.stopPropagation()
+                              }}
+                              onPointerDown={(e) => {
+                                e.stopPropagation()
+                              }}
+                            >
+                              <ItemActionsMenu item={relatedItem} inModal={true} />
+                            </Box>
+                          </Box>
+                        )
+                      })}
+                  </Box>
+                )}
+
+                {/* Clear float after all content */}
+                <Box clear="both" />
+
+                {/* Show message if no related images */}
+                {(!relatedData?.data || relatedData.data.length <= 1) && (
+                  <Box
+                    bg="gray.50"
+                    borderRadius="2xl"
+                    p={8}
+                    mb={6}
+                    breakInside="avoid"
+                    textAlign="center"
+                    css={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+                  >
                     <VStack>
-                      <Text color="gray.500" fontSize="lg" textAlign="center">
+                      <Text color="gray.500" fontSize="md">
                         No other images in this collection
                       </Text>
-                      <Text color="gray.400" fontSize="sm" textAlign="center">
+                      <Text color="gray.400" fontSize="sm">
                         This is the only image in this collection
                       </Text>
                     </VStack>
                   </Box>
                 )}
               </Box>
-            </Flex>
+              
+              {/* Bottom spacing for scroll */}
+              <Box h={8} />
+            </Box>
           )}
         </DialogContent>
       </DialogRoot>
