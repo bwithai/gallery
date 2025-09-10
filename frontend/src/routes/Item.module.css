@@ -1,0 +1,26 @@
+/* Item.module.css - True Masonry Layout with Larger Images */
+.masonryGrid {
+  display: flex;
+  margin-left: -1.25rem; /* Increased spacing for larger images */
+  width: auto;
+}
+
+.masonryColumn {
+  padding-left: 1.25rem; /* Increased spacing for larger images */
+  background-clip: padding-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.masonryColumn > div {
+  margin-bottom: 1.25rem; /* Increased spacing for larger images */
+  width: 100%;
+}
+
+/* Ensure images maintain aspect ratio in masonry */
+.masonryColumn img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+  

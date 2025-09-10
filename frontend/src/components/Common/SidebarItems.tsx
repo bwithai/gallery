@@ -8,8 +8,6 @@ import type { UserPublic } from "@/client"
 
 const items = [
   { icon: FiHome, title: "Dashboard", path: "/" },
-  { icon: FiBriefcase, title: "Items", path: "/items" },
-  { icon: FiSettings, title: "User Settings", path: "/settings" },
 ]
 
 interface SidebarItemsProps {
@@ -26,9 +24,7 @@ const SidebarItems = ({ onClose }: SidebarItemsProps) => {
   const queryClient = useQueryClient()
   const currentUser = queryClient.getQueryData<UserPublic>(["currentUser"])
 
-  const finalItems: Item[] = currentUser?.is_superuser
-    ? [...items, { icon: FiUsers, title: "Admin", path: "/admin" }]
-    : items
+  const finalItems: Item[] = [...items]
 
   const listItems = finalItems.map(({ icon, title, path }) => (
     <RouterLink key={title} to={path} onClick={onClose}>
