@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog"
 import useCustomToast from "@/hooks/useCustomToast"
 
-const DeleteUser = ({ id }: { id: string }) => {
+const DeleteUser = ({ id }: { id: number }) => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
   const { showSuccessToast, showErrorToast } = useCustomToast()
@@ -26,7 +26,7 @@ const DeleteUser = ({ id }: { id: string }) => {
     formState: { isSubmitting },
   } = useForm()
 
-  const deleteUser = async (id: string) => {
+  const deleteUser = async (id: number) => {
     await UsersService.deleteUser({ userId: id })
   }
 

@@ -10,6 +10,8 @@ from PIL import Image
 from app.api.deps import CurrentUser, SessionDep
 from app.models import Item, ItemCreate, ItemPublic, ItemsPublic, ItemUpdate, Message, Collection
 
+from app.core.config import settings
+
 router = APIRouter(prefix="/items", tags=["items"])
 
 
@@ -109,7 +111,7 @@ async def upload_image(
     unique_filename = f"{uuid.uuid4()}{file_extension}"
     
     # Create collection directory if it doesn't exist
-    collection_dir = f"media/storage/{collection.name.replace(' ', '_').lower()}"
+    collection_dir = f"{settings.IMAGE_STORAGE_PATH}/{collection.name.replace(' ', '_').lower()}"
     os.makedirs(collection_dir, exist_ok=True)
     
     # Save file
