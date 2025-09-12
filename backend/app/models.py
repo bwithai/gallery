@@ -95,7 +95,11 @@ class CollectionsPublic(SQLModel):
 # Shared properties
 class ItemBase(SQLModel):
     title: str = Field(min_length=1, max_length=255)
+    veneration: str | None = Field(default=None, max_length=255)
     description: str | None = Field(default=None, max_length=1000)
+    commission_date: datetime | None = Field(default=None)
+    owned_since: datetime | None = Field(default=None)
+    monitory_value: float | None = Field(default=None)
     # Image-specific fields
     filename: str = Field(max_length=255)
     file_path: str = Field(max_length=500)
@@ -109,6 +113,10 @@ class ItemBase(SQLModel):
 # Properties to receive on item creation
 class ItemCreate(SQLModel):
     title: str = Field(min_length=1, max_length=255)
+    veneration: str | None = Field(default=None, max_length=255)
+    commission_date: datetime | None = Field(default=None)
+    owned_since: datetime | None = Field(default=None)
+    monitory_value: float | None = Field(default=None)
     description: str | None = Field(default=None, max_length=1000)
     alt_text: str | None = Field(default=None, max_length=500)
     collection_id: int = Field(gt=0)  # Required: user must select a collection
@@ -117,6 +125,10 @@ class ItemCreate(SQLModel):
 # Properties to receive on item update
 class ItemUpdate(SQLModel):
     title: str | None = Field(default=None, min_length=1, max_length=255)
+    veneration: str | None = Field(default=None, max_length=255)
+    commission_date: datetime | None = Field(default=None)
+    owned_since: datetime | None = Field(default=None)
+    monitory_value: float | None = Field(default=None)
     description: str | None = Field(default=None, max_length=1000)
     alt_text: str | None = Field(default=None, max_length=500)
     collection_id: int | None = Field(default=None, gt=0)  # Allow moving to different collection
