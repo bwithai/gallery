@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8b28da10-6e54-4c17-91ff-58a08133abb7" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/backend/app/api/routes/items.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/routes/items.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/core/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/core/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/initial_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/initial_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Common/ItemActionsMenu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Common/ItemActionsMenu.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Common/Navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Common/Navbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Common/SidebarItems.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Common/SidebarItems.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Items/AddItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Items/AddItem.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Items/DeleteItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Items/DeleteItem.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Items/EditItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Items/EditItem.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/routeTree.gen.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routeTree.gen.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/routes/_layout/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routes/_layout/index.tsx" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="32XCtaLrI3E6SOjbf0V583werDb" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "update__requ",
+    "last_opened_file_path": "C:/Office/Office/Gallery/gallery/frontend/public/assets/images"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Office\Office\Gallery\gallery\frontend\public\assets\images" />
+      <recent name="C:\Office\Office\Gallery\gallery\frontend\public\assets" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Office\Office\Gallery\gallery\frontend\public\assets\images" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-0e3be3396995-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23339.19" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8b28da10-6e54-4c17-91ff-58a08133abb7" name="Changes" comment="" />
+      <created>1757557747036</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1757557747036</updated>
+    </task>
+    <servers />
+  </component>
+</project>
