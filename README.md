@@ -1,14 +1,12 @@
-# Full Stack FastAPI Template
-
-<a href="https://github.com/fastapi/full-stack-fastapi-template/actions?query=workflow%3ATest" target="_blank"><img src="https://github.com/fastapi/full-stack-fastapi-template/workflows/Test/badge.svg" alt="Test"></a>
-<a href="https://coverage-badge.samuelcolvin.workers.dev/redirect/fastapi/full-stack-fastapi-template" target="_blank"><img src="https://coverage-badge.samuelcolvin.workers.dev/fastapi/full-stack-fastapi-template.svg" alt="Coverage"></a>
+# Treasures & Trinkits
+Your local collection storage to capture your memmories, a paintrest like application. developed from [FastApi-Full-Stack-Template](https://github.com/fastapi/full-stack-fastapi-template/)
 
 ## Technology Stack and Features
 
 - ⚡ [**FastAPI**](https://fastapi.tiangolo.com) for the Python backend API.
     - 🧰 [SQLModel](https://sqlmodel.tiangolo.com) for the Python SQL database interactions (ORM).
     - 🔍 [Pydantic](https://docs.pydantic.dev), used by FastAPI, for the data validation and settings management.
-    - 💾 [PostgreSQL](https://www.postgresql.org) as the SQL database.
+    - 💾 [MySQL](https://github.com/bwithai/gallery) as the SQL database.
 - 🚀 [React](https://react.dev) for the frontend.
     - 💃 Using TypeScript, hooks, Vite, and other parts of a modern frontend stack.
     - 🎨 [Chakra UI](https://chakra-ui.com) for the frontend components.
@@ -26,31 +24,13 @@
 
 ### Dashboard Login
 
-[![API docs](img/login.png)](https://github.com/fastapi/full-stack-fastapi-template)
+[![API docs](img/login.png)](https://github.com/bwithai/gallery)
 
-### Dashboard - Admin
+### Demo
 
-[![API docs](img/dashboard.png)](https://github.com/fastapi/full-stack-fastapi-template)
-
-### Dashboard - Create User
-
-[![API docs](img/dashboard-create.png)](https://github.com/fastapi/full-stack-fastapi-template)
-
-### Dashboard - Items
-
-[![API docs](img/dashboard-items.png)](https://github.com/fastapi/full-stack-fastapi-template)
-
-### Dashboard - User Settings
-
-[![API docs](img/dashboard-user-settings.png)](https://github.com/fastapi/full-stack-fastapi-template)
-
-### Dashboard - Dark Mode
-
-[![API docs](img/dashboard-dark.png)](https://github.com/fastapi/full-stack-fastapi-template)
-
-### Interactive API Documentation
-
-[![API docs](img/docs.png)](https://github.com/fastapi/full-stack-fastapi-template)
+[![App demo](img/1.png)](https://github.com/bwithai/gallery)
+[![App demo](img/2.png)](https://github.com/bwithai/gallery)
+[![App demo](img/3.png)](https://github.com/bwithai/gallery)
 
 ## How To Use It
 
