@@ -35,7 +35,7 @@ export const ItemActionsMenu = ({ item, inModal = false }: ItemActionsMenuProps)
         zIndex={inModal ? "dropdown" : "auto"}
       >
         <EditItem item={item} />
-        <DeleteItem id={item.id} />
+        <DeleteItem item={item} />
       </MenuContent>
     </MenuRoot>
   )

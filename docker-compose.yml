@@ -31,99 +31,99 @@ services:
     environment:
       - ADMINER_DESIGN=pepa-linha-dark
 
-  prestart:
-    image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
-    build:
-      context: ./backend
-    networks:
-      - traefik-public
-      - default
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: "no"
-    command: bash scripts/prestart.sh
-    env_file:
-      - .env
-    volumes:
-      - ./backend/app:/app/app  # Only mount the app directory
-      - ./backend/media/storage:/app/media/storage  # Mount for asset images and QR codes
-    environment:
-      - DOMAIN=${DOMAIN}
-      - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
-      - ENVIRONMENT=${ENVIRONMENT}
-      - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
-      - SECRET_KEY=${SECRET_KEY?Variable not set}
-      - FIRST_SUPERUSER=${FIRST_SUPERUSER?Variable not set}
-      - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD?Variable not set}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - EMAILS_FROM_EMAIL=${EMAILS_FROM_EMAIL}
-      - MYSQL_SERVER=db
-      - MYSQL_PORT=${MYSQL_PORT}
-      - MYSQL_DATABASE=${MYSQL_DB}
-      - MYSQL_USER=${MYSQL_USER?Variable not set}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD?Variable not set}
-      - SENTRY_DSN=${SENTRY_DSN}
+  # prestart:
+  #   image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+  #   build:
+  #     context: ./backend
+  #   networks:
+  #     - traefik-public
+  #     - default
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   restart: "no"
+  #   command: bash scripts/prestart.sh
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - ./backend/app:/app/app  # Only mount the app directory
+  #     - ./backend/media/storage:/app/media/storage  # Mount for asset images and QR codes
+  #   environment:
+  #     - DOMAIN=${DOMAIN}
+  #     - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
+  #     - ENVIRONMENT=${ENVIRONMENT}
+  #     - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
+  #     - SECRET_KEY=${SECRET_KEY?Variable not set}
+  #     - FIRST_SUPERUSER=${FIRST_SUPERUSER?Variable not set}
+  #     - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD?Variable not set}
+  #     - SMTP_HOST=${SMTP_HOST}
+  #     - SMTP_USER=${SMTP_USER}
+  #     - SMTP_PASSWORD=${SMTP_PASSWORD}
+  #     - EMAILS_FROM_EMAIL=${EMAILS_FROM_EMAIL}
+  #     - MYSQL_SERVER=db
+  #     - MYSQL_PORT=${MYSQL_PORT}
+  #     - MYSQL_DATABASE=${MYSQL_DB}
+  #     - MYSQL_USER=${MYSQL_USER?Variable not set}
+  #     - MYSQL_PASSWORD=${MYSQL_PASSWORD?Variable not set}
+  #     - SENTRY_DSN=${SENTRY_DSN}
 
-  backend:
-    image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
-    restart: always
-    networks:
-      - traefik-public
-      - default
-    depends_on:
-      db:
-        condition: service_healthy
-      prestart:
-        condition: service_completed_successfully
-    env_file:
-      - .env
-    environment:
-      - DOMAIN=${DOMAIN}
-      - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
-      - ENVIRONMENT=${ENVIRONMENT}
-      - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
-      - SECRET_KEY=${SECRET_KEY?Variable not set}
-      - FIRST_SUPERUSER=${FIRST_SUPERUSER?Variable not set}
-      - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD?Variable not set}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - EMAILS_FROM_EMAIL=${EMAILS_FROM_EMAIL}
-      - MYSQL_SERVER=db
-      - MYSQL_PORT=${MYSQL_PORT}
-      - MYSQL_DATABASE=${MYSQL_DB}
-      - MYSQL_USER=${MYSQL_USER?Variable not set}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD?Variable not set}
-      - SENTRY_DSN=${SENTRY_DSN}
-    volumes:
-      - ./backend/app:/app/app  # Only mount the app directory
-      - ./backend/media/storage:/app/media/storage  # Mount for asset images and QR codes
+  # backend:
+  #   image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+  #   restart: always
+  #   networks:
+  #     - traefik-public
+  #     - default
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #     prestart:
+  #       condition: service_completed_successfully
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - DOMAIN=${DOMAIN}
+  #     - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
+  #     - ENVIRONMENT=${ENVIRONMENT}
+  #     - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
+  #     - SECRET_KEY=${SECRET_KEY?Variable not set}
+  #     - FIRST_SUPERUSER=${FIRST_SUPERUSER?Variable not set}
+  #     - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD?Variable not set}
+  #     - SMTP_HOST=${SMTP_HOST}
+  #     - SMTP_USER=${SMTP_USER}
+  #     - SMTP_PASSWORD=${SMTP_PASSWORD}
+  #     - EMAILS_FROM_EMAIL=${EMAILS_FROM_EMAIL}
+  #     - MYSQL_SERVER=db
+  #     - MYSQL_PORT=${MYSQL_PORT}
+  #     - MYSQL_DATABASE=${MYSQL_DB}
+  #     - MYSQL_USER=${MYSQL_USER?Variable not set}
+  #     - MYSQL_PASSWORD=${MYSQL_PASSWORD?Variable not set}
+  #     - SENTRY_DSN=${SENTRY_DSN}
+  #   volumes:
+  #     - ./backend/app:/app/app  # Only mount the app directory
+  #     - ./backend/media/storage:/app/media/storage  # Mount for asset images and QR codes
 
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health-check/"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health-check/"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
 
-    build:
-      context: ./backend
+  #   build:
+  #     context: ./backend
 
-  frontend:
-    image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
-    restart: always
-    networks:
-      - traefik-public
-      - default
-    volumes:
-      - ./frontend/public/js:/usr/share/nginx/html/js  # Mount local JS directory
-    build:
-      context: ./frontend
-      args:
-        - VITE_API_URL=https://api.${DOMAIN?Variable not set}
-        - NODE_ENV=production
+  # frontend:
+  #   image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
+  #   restart: always
+  #   networks:
+  #     - traefik-public
+  #     - default
+  #   volumes:
+  #     - ./frontend/public/js:/usr/share/nginx/html/js  # Mount local JS directory
+  #   build:
+  #     context: ./frontend
+  #     args:
+  #       - VITE_API_URL=https://api.${DOMAIN?Variable not set}
+  #       - NODE_ENV=production
 volumes:
   app-db-data:
 

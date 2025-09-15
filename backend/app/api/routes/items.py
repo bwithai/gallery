@@ -60,6 +60,68 @@ def read_items(
     return ItemsPublic(data=items, count=count)
 
 
+@router.get("/dashboard", response_model=ItemsPublic)
+def read_dashboard_items(
+    session: SessionDep, 
+    current_user: CurrentUser, 
+    skip: int = 0, 
+    limit: int = 100
+) -> Any:
+    """
+    Retrieve shuffled items from different collections for dashboard.
+    Returns images from public collections mixed with user's own images.
+    """
+    from sqlalchemy import text
+    
+    # Determine random function based on database type
+    db_uri = str(settings.SQLALCHEMY_DATABASE_URI)
+    if "sqlite" in db_uri:
+        random_func = "RANDOM()"
+    else:
+        random_func = "RAND()"
+    
+    if current_user.is_superuser:
+        # Admin sees all images, shuffled
+        count_query = select(func.count()).select_from(Item)
+        count = session.exec(count_query).one()
+        
+        # Use random ordering to shuffle items from different collections
+        # Optimize for smaller page sizes with better performance
+        statement = (
+            select(Item)
+            .order_by(text(random_func))
+            .offset(skip)
+            .limit(limit)
+        )
+        items = session.exec(statement).all()
+    else:
+        # Users see public collection images mixed with their own images, shuffled
+        public_collections_subquery = select(Collection.id).where(Collection.is_public == True)
+        
+        # Count items from public collections + user's own items
+        count_query = select(func.count()).select_from(Item).where(
+            (Item.collection_id.in_(public_collections_subquery)) | 
+            (Item.owner_id == current_user.id)
+        )
+        count = session.exec(count_query).one()
+        
+        # Get shuffled items from public collections + user's own items
+        # Optimize for smaller page sizes with better performance
+        statement = (
+            select(Item)
+            .where(
+                (Item.collection_id.in_(public_collections_subquery)) | 
+                (Item.owner_id == current_user.id)
+            )
+            .order_by(text(random_func))
+            .offset(skip)
+            .limit(limit)
+        )
+        items = session.exec(statement).all()
+
+    return ItemsPublic(data=items, count=count)
+
+
 @router.get("/{id}", response_model=ItemPublic)
 def read_item(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     """

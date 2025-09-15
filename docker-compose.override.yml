@@ -9,36 +9,36 @@ services:
     ports:
       - "8080:8080"
 
-  backend:
-    restart: "no"
-    ports:
-      - "8000:8000"
-    build:
-      context: ./backend
-    # command: sleep infinity  # Infinite loop to keep container alive doing nothing
-    command:
-      - fastapi
-      - run
-      - --reload
-      - "app/main.py"
-    # TODO: remove once coverage is done locally
-    volumes:
-      - ./backend/htmlcov:/app/htmlcov
-    environment:
-      SMTP_HOST: "mailcatcher"
-      SMTP_PORT: "1025"
-      SMTP_TLS: "false"
-      EMAILS_FROM_EMAIL: "noreply@example.com"
+  # backend:
+  #   restart: "no"
+  #   ports:
+  #     - "8000:8000"
+  #   build:
+  #     context: ./backend
+  #   # command: sleep infinity  # Infinite loop to keep container alive doing nothing
+  #   command:
+  #     - fastapi
+  #     - run
+  #     - --reload
+  #     - "app/main.py"
+  #   # TODO: remove once coverage is done locally
+  #   volumes:
+  #     - ./backend/htmlcov:/app/htmlcov
+  #   environment:
+  #     SMTP_HOST: "mailcatcher"
+  #     SMTP_PORT: "1025"
+  #     SMTP_TLS: "false"
+  #     EMAILS_FROM_EMAIL: "noreply@example.com"
 
-  frontend:
-    restart: "no"
-    ports:
-      - "80:80"
-    build:
-      context: ./frontend
-      args:
-        - VITE_API_URL=http://localhost:8000
-        - NODE_ENV=development
+  # frontend:
+  #   restart: "no"
+  #   ports:
+  #     - "80:80"
+  #   build:
+  #     context: ./frontend
+  #     args:
+  #       - VITE_API_URL=http://localhost:8000
+  #       - NODE_ENV=development
 
 networks:
   traefik-public:

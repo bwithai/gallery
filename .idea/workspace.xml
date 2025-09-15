@@ -5,21 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8b28da10-6e54-4c17-91ff-58a08133abb7" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/alembic/versions/1a31ce608336_add_cascade_delete_relationships.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/alembic/versions/9c0a54914c78_add_max_length_for_string_varchar_.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/alembic/versions/d98dd8ec85a3_edit_replace_id_integers_in_all_models_.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/alembic/versions/e2412789c190_initialize_models.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/api/routes/items.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/api/routes/items.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/core/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/core/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.override.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.override.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.traefik.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/public/assets/images/icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Admin/DeleteUser.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Admin/DeleteUser.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/initial_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/initial_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Common/ItemActionsMenu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Common/ItemActionsMenu.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/Common/Navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Common/Navbar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/Common/SidebarItems.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Common/SidebarItems.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Items/AddItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Items/AddItem.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Items/DeleteItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Items/DeleteItem.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Items/EditItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Items/EditItem.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/routeTree.gen.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routeTree.gen.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/routes/_layout/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routes/_layout/index.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +36,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "dev",
+    "git-widget-placeholder": "update__requ",
     "last_opened_file_path": "C:/Office/Office/Gallery/gallery/frontend/public/assets/images"
   }
 }]]></component>

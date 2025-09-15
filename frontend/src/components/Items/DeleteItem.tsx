@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { FiTrash2 } from "react-icons/fi"
 
-import { ItemsService } from "@/client"
+import { ItemsService, type ItemPublic } from "@/client"
 import {
   DialogActionTrigger,
   DialogBody,
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog"
 import useCustomToast from "@/hooks/useCustomToast"
 
-const DeleteItem = ({ id }: { id: number }) => {
+const DeleteItem = ({ item }: { item: ItemPublic }) => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
   const { showSuccessToast, showErrorToast } = useCustomToast()
@@ -35,17 +35,27 @@ const DeleteItem = ({ id }: { id: number }) => {
     onSuccess: () => {
       showSuccessToast("The item was deleted successfully")
       setIsOpen(false)
+      
+      // Invalidate all items queries
+      queryClient.invalidateQueries({ queryKey: ["items"] })
+      
+      // Also invalidate collection-specific queries
+      if (item.collection_id) {
+        queryClient.invalidateQueries({ 
+          queryKey: ["items", "collection", item.collection_id] 
+        })
+        queryClient.invalidateQueries({ 
+          queryKey: ["related-items", item.collection_id] 
+        })
+      }
     },
     onError: () => {
       showErrorToast("An error occurred while deleting the item")
     },
-    onSettled: () => {
-      queryClient.invalidateQueries()
-    },
   })
 
   const onSubmit = async () => {
-    mutation.mutate(id)
+    mutation.mutate(item.id)
   }
 
   return (
