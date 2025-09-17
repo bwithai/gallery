@@ -47,9 +47,11 @@ const Sidebar = () => {
         <DrawerContent maxW="xs">
           <DrawerCloseTrigger />
           <DrawerBody>
-            <Flex flexDir="column" justify="space-between">
-              <Box>
+            <Flex flexDir="column" justify="space-between" h="full">
+              <Box flex="1" overflowY="hidden">
                 <SidebarItems onClose={() => setOpen(false)} />
+              </Box>
+              <Box>
                 <Flex
                   as="button"
                   onClick={() => {
@@ -63,12 +65,12 @@ const Sidebar = () => {
                   <FiLogOut />
                   <Text>Log Out</Text>
                 </Flex>
+                {currentUser?.email && (
+                  <Text fontSize="sm" p={2} truncate maxW="sm">
+                    Logged in as: {currentUser.email}
+                  </Text>
+                )}
               </Box>
-              {currentUser?.email && (
-                <Text fontSize="sm" p={2} truncate maxW="sm">
-                  Logged in as: {currentUser.email}
-                </Text>
-              )}
             </Flex>
           </DrawerBody>
           <DrawerCloseTrigger />
@@ -85,8 +87,9 @@ const Sidebar = () => {
         minW="xs"
         h="100vh"
         p={4}
+        flexDirection="column"
       >
-        <Box w="100%">
+        <Box w="100%" flex="1" overflowY="hidden">
           <SidebarItems />
         </Box>
       </Box>

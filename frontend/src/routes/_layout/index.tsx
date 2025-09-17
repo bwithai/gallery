@@ -15,10 +15,11 @@ import { createFileRoute } from "@tanstack/react-router"
 import { FiImage, FiBookmark, FiShare2, FiMaximize2, FiX, FiChevronLeft, FiChevronRight, FiArrowLeft, FiArrowRight } from "react-icons/fi"
 import { z } from "zod"
 
-import { ItemsService } from "@/client"
+import { ItemsService, CollectionsService } from "@/client"
 import { ItemActionsMenu } from "@/components/Common/ItemActionsMenu"
 import { BlurUpImage } from "@/components/Common/BlurUpImage"
 import PendingItems from "@/components/Pending/PendingItems"
+import { useFavorites } from "@/hooks/useFavorites"
 import {
   DialogContent,
   DialogRoot,
@@ -55,6 +56,7 @@ function ImageGallery({ selectedItem, setSelectedItem, page, setPage }: {
   setPage: (page: number) => void
 }) {
   const queryClient = useQueryClient()
+  const { saveItemMutation, isItemInFavorites, isLoading: isSavingItem } = useFavorites()
 
   const {
     data,
@@ -230,17 +232,20 @@ function ImageGallery({ selectedItem, setSelectedItem, page, setPage }: {
                   <HStack justify="flex-end" gap={2}>
                     <Button
                       size="sm"
-                      colorScheme="red"
+                      colorScheme={isItemInFavorites(item.collection_id) ? "gray" : "red"}
                       borderRadius="full"
                       shadow="lg"
+                      loading={isSavingItem}
                       onClick={(e) => {
                         e.stopPropagation()
-                        // TODO: Implement save functionality
-                        console.log('Save item:', item.id)
+                        saveItemMutation.mutate({
+                          itemId: item.id,
+                          isSaved: isItemInFavorites(item.collection_id)
+                        })
                       }}
                     >
                       <FiBookmark style={{ marginRight: '4px' }} />
-                      Save
+                      {isItemInFavorites(item.collection_id) ? "Saved" : "Save"}
                     </Button>
                     <Button
                       size="sm"
@@ -397,6 +402,15 @@ function ImageGallery({ selectedItem, setSelectedItem, page, setPage }: {
 function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: any, setSelectedItem: (item: any) => void }) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [fullscreenItem, setFullscreenItem] = useState<any>(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const { saveItemMutation, isItemInFavorites, isLoading: isSavingItem } = useFavorites()
+
+  // Fetch collection information
+  const { data: collection } = useQuery({
+    queryKey: ["collection", selectedItem?.collection_id],
+    queryFn: () => selectedItem ? CollectionsService.readCollection({ id: selectedItem.collection_id }) : null,
+    enabled: !!selectedItem?.collection_id,
+  })
 
   // Fetch ALL related items from the same collection
   const { data: relatedData } = useQuery({
@@ -409,20 +423,37 @@ function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: a
     enabled: !!selectedItem?.collection_id,
   })
 
-  // Split related images into two groups for Pinterest-style layout
-  const { rightSideImages, bottomImages } = useMemo(() => {
-    if (!relatedData?.data) return { rightSideImages: [], bottomImages: [] }
-    
-    const filteredRelated = relatedData.data.filter(item => item.id !== selectedItem?.id)
-    const rightSideCount = 4 // Show 4 images on the right side
-    
-    // Randomly select 4 images for right side
-    const shuffled = [...filteredRelated].sort(() => Math.random() - 0.5)
-    return {
-      rightSideImages: shuffled.slice(0, rightSideCount),
-      bottomImages: shuffled.slice(rightSideCount) // Rest go to bottom
+  // Get all images in collection for navigation
+  const allCollectionImages = useMemo(() => {
+    return relatedData?.data || []
+  }, [relatedData])
+
+  // Update current image index when selectedItem changes
+  useEffect(() => {
+    if (selectedItem && allCollectionImages.length > 0) {
+      const index = allCollectionImages.findIndex(item => item.id === selectedItem.id)
+      setCurrentImageIndex(index >= 0 ? index : 0)
     }
-  }, [relatedData, selectedItem])
+  }, [selectedItem, allCollectionImages])
+
+  // Navigation functions
+  const handlePrevImage = () => {
+    if (allCollectionImages.length === 0) return
+    const prevIndex = currentImageIndex === 0 ? allCollectionImages.length - 1 : currentImageIndex - 1
+    setSelectedItem(allCollectionImages[prevIndex])
+  }
+
+  const handleNextImage = () => {
+    if (allCollectionImages.length === 0) return
+    const nextIndex = (currentImageIndex + 1) % allCollectionImages.length
+    setSelectedItem(allCollectionImages[nextIndex])
+  }
+
+  // Split related images for bottom section (exclude current image)
+  const relatedImages = useMemo(() => {
+    if (!allCollectionImages || !selectedItem) return []
+    return allCollectionImages.filter(item => item.id !== selectedItem.id)
+  }, [allCollectionImages, selectedItem])
 
   const handleFullscreenOpen = (item: any) => {
     setFullscreenItem(item)
@@ -482,8 +513,8 @@ function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: a
         <Container maxW="8xl">
           {/* Close button for inline view */}
           <Flex justify="space-between" align="center" mb={6}>
-            <Heading size="md" color="gray.700">
-              Image Details
+            <Heading size="md" color="teal.700">
+              {collection?.name || 'Loading...'}
             </Heading>
             <Button
               size="sm"
@@ -496,18 +527,18 @@ function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: a
             </Button>
           </Flex>
 
-          {/* Pinterest-style layout with main image on left, related on right */}
-          <Flex 
-            direction={{ base: "column", lg: "row" }} 
-            gap={8} 
-            mb={12}
-            align="flex-start"
-          >
-            {/* Main image - Left side (about half screen) */}
-            <Box
-              flex={{ base: "1", lg: "1 1 48%" }}
-              maxW={{ base: "full", lg: "48%" }}
+          {/* Upper section - Full width with image and navigation */}
+          <Box mb={8}>
+            <Flex 
+              direction={{ base: "column", lg: "row" }} 
+              gap={8} 
+              align="flex-start"
             >
+              {/* Main image section - Left side */}
+              <Box
+                flex={{ base: "1", lg: "1 1 60%" }}
+                maxW={{ base: "full", lg: "60%" }}
+              >
               <Box
                 key={`main-${selectedItem.id}`}
                 bg="white"
@@ -577,23 +608,58 @@ function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: a
                   </Flex>
                 </Box>
 
-                {/* "Currently Viewing" badge */}
+                {/* Navigation buttons */}
+                {allCollectionImages.length > 1 && (
+                  <>
+                    <Button
+                      position="absolute"
+                      left="4"
+                      top="50%"
+                      transform="translateY(-50%)"
+                      bg="rgba(255,255,255,0.9)"
+                      color="gray.700"
+                      borderRadius="full"
+                      shadow="xl"
+                      size="md"
+                      onClick={handlePrevImage}
+                      _hover={{ bg: "white" }}
+                    >
+                      <FiChevronLeft size="20" />
+                    </Button>
+                    
+                    <Button
+                      position="absolute"
+                      right="4"
+                      top="50%"
+                      transform="translateY(-50%)"
+                      bg="rgba(255,255,255,0.9)"
+                      color="gray.700"
+                      borderRadius="full"
+                      shadow="xl"
+                      size="md"
+                      onClick={handleNextImage}
+                      _hover={{ bg: "white" }}
+                    >
+                      <FiChevronRight size="20" />
+                    </Button>
+                  </>
+                )}
+
+                {/* Image counter badge */}
                 <Box
                   position="absolute"
                   top="4"
                   left="4"
-                  bg="blue.500"
+                  bg="rgba(0,0,0,0.7)"
                   color="white"
-                  px={4}
-                  py={2}
+                  px={3}
+                  py={1}
                   borderRadius="full"
                   fontSize="sm"
-                  fontWeight="bold"
-                  textTransform="uppercase"
-                  letterSpacing="wide"
+                  fontWeight="medium"
                   shadow="lg"
                 >
-                  Now Viewing
+                  {currentImageIndex + 1} of {allCollectionImages.length}
                 </Box>
 
                 {/* Action Menu and Fullscreen Button */}
@@ -629,149 +695,183 @@ function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: a
               </Box>
             </Box>
 
-            {/* Right side: "More like this" section */}
-            {rightSideImages.length > 0 && (
-              <Box flex={{ base: "1", lg: "1 1 48%" }} maxW={{ base: "full", lg: "48%" }}>
-                <VStack align="start" gap={6}>
-                  <Heading size="md" color="gray.700">
-                    More like this
+              
+              {/* Image Details - Right side */}
+              <Box
+                flex={{ base: "1", lg: "1 1 35%" }}
+                maxW={{ base: "full", lg: "35%" }}
+                bg="white"
+                borderRadius="2xl"
+                p={6}
+                shadow="lg"
+                maxH={{ base: "none", lg: "50vh" }}
+                overflowY="auto"
+                css={{
+                  '&::-webkit-scrollbar': {
+                    width: '6px',
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    background: '#f1f1f1',
+                    borderRadius: '3px',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    background: '#c1c1c1',
+                    borderRadius: '3px',
+                  },
+                  '&::-webkit-scrollbar-thumb:hover': {
+                    background: '#a8a8a8',
+                  },
+                }}
+              >
+                <VStack align="start" gap={4}>
+                  <Heading size="lg" color="gray.800">
+                    {selectedItem.title}
                   </Heading>
                   
-                  {/* Right-side related images - smaller grid */}
-                  <Masonry
-                    breakpointCols={{
-                      default: 2, // 2 columns on right side
-                      768: 2,
-                      480: 1,
-                    }}
-                    className={styles.masonryGrid}
-                    columnClassName={styles.masonryColumn}
-                  >
-                    {rightSideImages.map((relatedItem) => (
-                        <Box
-                          key={`right-${relatedItem.id}`}
-                          borderRadius="2xl"
-                          overflow="hidden"
-                          mb={6}
-                          cursor="pointer"
-                          transition="all 0.3s ease"
-                          shadow="md"
-                          position="relative"
-                          _hover={{ 
-                            transform: "scale(1.04)",
-                            shadow: "lg",
-                            "& .pinterest-overlay": {
-                              opacity: 1
-                            }
-                          }}
-                          onClick={() => setSelectedItem(relatedItem)}
-                          onDoubleClick={() => handleFullscreenOpen(relatedItem)}
-                        >
-                          <BlurUpImage
-                            src={`/api/v1/items/${relatedItem.id}/image`}
-                            alt={relatedItem.alt_text || relatedItem.title}
-                            objectFit="cover"
-                            w="full"
-                            loading="lazy"
-                            fallback={
-                              <Box
-                                bg="gray.200"
-                                display="flex"
-                                alignItems="center"
-                                justifyContent="center"
-                                w="full"
-                                minH="200px"
-                                borderRadius="2xl"
-                              >
-                                <FiImage size="48" color="gray.400" />
-                              </Box>
-                            }
-                          />
-                          
-                          {/* Pinterest-style hover overlay */}
-                          <Box
-                            className="pinterest-overlay"
-                            position="absolute"
-                            inset="0"
-                            bg="rgba(0,0,0,0.25)"
-                            opacity={0}
-                            transition="opacity 0.3s ease"
-                            display="flex"
-                            flexDirection="column"
-                            justifyContent="space-between"
-                            p={3}
-                            borderRadius="2xl"
-                          >
-                            {/* Top section with action buttons */}
-                            <HStack justify="flex-end" gap={2}>
-                              <Button
-                                size="xs"
-                                colorScheme="red"
-                                borderRadius="full"
-                                shadow="lg"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  console.log('Save related item:', relatedItem.id)
-                                }}
-                              >
-                                <FiBookmark style={{ marginRight: '2px' }} />
-                                Save
-                              </Button>
-                              <Button
-                                size="xs"
-                                variant="solid"
-                                bg="white"
-                                color="gray.700"
-                                borderRadius="full"
-                                shadow="lg"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  handleFullscreenOpen(relatedItem)
-                                }}
-                              >
-                                <FiMaximize2 />
-                              </Button>
-                            </HStack>
+                  {selectedItem.description && (
+                    <Text 
+                      fontSize="md" 
+                      color="gray.600"
+                      lineHeight="1.6"
+                    >
+                      {selectedItem.description}
+                    </Text>
+                  )}
+                  
+                  {/* Image metadata */}
+                  <VStack align="start" gap={4} w="full">
+                    <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+                      Image Details
+                    </Text>
+                    
+                    {/* Basic Information */}
+                    <Box bg="gray.50" p={4} borderRadius="xl" w="full">
+                      <VStack align="start" gap={2}>
+                        <Text fontSize="xs" fontWeight="bold" color="gray.500" textTransform="uppercase" letterSpacing="wide">
+                          Basic Information
+                        </Text>
+                        
+                        {selectedItem.veneration && (
+                          <Flex justify="space-between" w="full">
+                            <Text fontSize="sm" color="gray.600">Veneration:</Text>
+                            <Text fontSize="sm" fontWeight="medium">{selectedItem.veneration}</Text>
+                          </Flex>
+                        )}
+                        
+                        {selectedItem.alt_text && (
+                          <Flex justify="space-between" w="full">
+                            <Text fontSize="sm" color="gray.600">Alt Text:</Text>
+                            <Text fontSize="sm" fontWeight="medium" textAlign="right" maxW="60%">{selectedItem.alt_text}</Text>
+                          </Flex>
+                        )}
+                        
+                        {selectedItem.commission_date && (
+                          <Flex justify="space-between" w="full">
+                            <Text fontSize="sm" color="gray.600">Commission Date:</Text>
+                            <Text fontSize="sm" fontWeight="medium">{new Date(selectedItem.commission_date).toLocaleDateString()}</Text>
+                          </Flex>
+                        )}
+                        
+                        {selectedItem.owned_since && (
+                          <Flex justify="space-between" w="full">
+                            <Text fontSize="sm" color="gray.600">Owned Since:</Text>
+                            <Text fontSize="sm" fontWeight="medium">{new Date(selectedItem.owned_since).toLocaleDateString()}</Text>
+                          </Flex>
+                        )}
+                        
+                        {selectedItem.monitory_value && (
+                          <Flex justify="space-between" w="full">
+                            <Text fontSize="sm" color="gray.600">Monetary Value:</Text>
+                            <Text fontSize="sm" fontWeight="medium" color="green.600">Rs. {selectedItem.monitory_value.toLocaleString()}</Text>
+                          </Flex>
+                        )}
+                      </VStack>
+                    </Box>
 
-                            {/* Bottom section with item info */}
-                            <VStack align="start" gap={0}>
-                              <Text
-                                color="white"
-                                fontSize="xs"
-                                fontWeight="bold"
-                                textShadow="0 1px 2px rgba(0,0,0,0.7)"
-                                css={{
-                                  display: '-webkit-box',
-                                  WebkitLineClamp: 1,
-                                  WebkitBoxOrient: 'vertical',
-                                  overflow: 'hidden'
-                                }}
-                              >
-                                {relatedItem.title}
-                              </Text>
-                            </VStack>
-                          </Box>
-                        </Box>
-                      ))}
-                  </Masonry>
+                    {/* Technical Information */}
+                    <Box bg="gray.50" p={4} borderRadius="xl" w="full">
+                      <VStack align="start" gap={2}>
+                        <Text fontSize="xs" fontWeight="bold" color="gray.500" textTransform="uppercase" letterSpacing="wide">
+                          Technical Details
+                        </Text>
+                        
+                        {(selectedItem.width && selectedItem.height) && (
+                          <Flex justify="space-between" w="full">
+                            <Text fontSize="sm" color="gray.600">Dimensions:</Text>
+                            <Text fontSize="sm" fontWeight="medium">{selectedItem.width} × {selectedItem.height} px</Text>
+                          </Flex>
+                        )}
+                        
+                        <Flex justify="space-between" w="full">
+                          <Text fontSize="sm" color="gray.600">Format:</Text>
+                          <Text fontSize="sm" fontWeight="medium">{selectedItem.mime_type}</Text>
+                        </Flex>
+                        
+                        <Flex justify="space-between" w="full">
+                          <Text fontSize="sm" color="gray.600">File Size:</Text>
+                          <Text fontSize="sm" fontWeight="medium">{(selectedItem.file_size / 1024 / 1024).toFixed(2)} MB</Text>
+                        </Flex>
+                        
+                        <Flex justify="space-between" w="full">
+                          <Text fontSize="sm" color="gray.600">Filename:</Text>
+                          <Text fontSize="sm" fontWeight="medium" textAlign="right" maxW="60%" css={{
+                            wordBreak: 'break-all'
+                          }}>{selectedItem.filename}</Text>
+                        </Flex>
+                        
+                        <Flex justify="space-between" w="full">
+                          <Text fontSize="sm" color="gray.600">Upload Date:</Text>
+                          <Text fontSize="sm" fontWeight="medium">{new Date(selectedItem.upload_date).toLocaleString()}</Text>
+                        </Flex>
+                      </VStack>
+                    </Box>
+                  </VStack>
+                  
+                  {/* Action buttons */}
+                  <HStack w="full" gap={3} pt={2}>
+                    <Button
+                      size="sm"
+                      colorScheme={isItemInFavorites(selectedItem.collection_id) ? "gray" : "red"}
+                      flex={1}
+                      loading={isSavingItem}
+                      onClick={() => {
+                        saveItemMutation.mutate({
+                          itemId: selectedItem.id,
+                          isSaved: isItemInFavorites(selectedItem.collection_id)
+                        })
+                      }}
+                    >
+                      <FiBookmark style={{ marginRight: '6px' }} />
+                      {isItemInFavorites(selectedItem.collection_id) ? "Saved" : "Save"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      flex={1}
+                      onClick={() => console.log('Share item:', selectedItem.id)}
+                    >
+                      <FiShare2 style={{ marginRight: '6px' }} />
+                      Share
+                    </Button>
+                  </HStack>
                 </VStack>
               </Box>
-            )}
-          </Flex>
+            </Flex>
+          </Box>
 
-          {/* Bottom section: "More ideas" spanning full width */}
-          {bottomImages.length > 0 && (
+          {/* Bottom section: Related images from collection */}
+          {relatedImages.length > 0 && (
             <Box w="full">
               <VStack align="start" gap={6}>
                 <Heading size="md" color="gray.700">
-                  More from this collection
+                  More from this collection ({relatedImages.length} images)
                 </Heading>
                 
                 {/* Full-width masonry grid */}
                 <Masonry
                   breakpointCols={{
-                    default: 4,
-                    1600: 3,
+                    default: 5,
+                    1600: 4,
                     1200: 3,
                     768: 2,
                     480: 1,
@@ -779,12 +879,12 @@ function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: a
                   className={styles.masonryGrid}
                   columnClassName={styles.masonryColumn}
                 >
-                  {bottomImages.map((relatedItem) => (
+                  {relatedImages.map((relatedItem) => (
                       <Box
-                        key={`bottom-${relatedItem.id}`}
+                        key={`related-${relatedItem.id}`}
                         borderRadius="2xl"
                         overflow="hidden"
-                        mb={8}
+                        mb={6}
                         cursor="pointer"
                         transition="all 0.3s ease"
                         shadow="md"
@@ -812,10 +912,10 @@ function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: a
                               alignItems="center"
                               justifyContent="center"
                               w="full"
-                              minH="250px"
+                              minH="200px"
                               borderRadius="2xl"
                             >
-                              <FiImage size="64" color="gray.400" />
+                              <FiImage size="48" color="gray.400" />
                             </Box>
                           }
                         />
@@ -838,16 +938,20 @@ function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: a
                           <HStack justify="flex-end" gap={2}>
                             <Button
                               size="xs"
-                              colorScheme="red"
+                              colorScheme={isItemInFavorites(relatedItem.collection_id) ? "gray" : "red"}
                               borderRadius="full"
                               shadow="lg"
+                              loading={isSavingItem}
                               onClick={(e) => {
                                 e.stopPropagation()
-                                console.log('Save related item:', relatedItem.id)
+                                saveItemMutation.mutate({
+                                  itemId: relatedItem.id,
+                                  isSaved: isItemInFavorites(relatedItem.collection_id)
+                                })
                               }}
                             >
                               <FiBookmark style={{ marginRight: '2px' }} />
-                              Save
+                              {isItemInFavorites(relatedItem.collection_id) ? "Saved" : "Save"}
                             </Button>
                             <Button
                               size="xs"
@@ -862,20 +966,6 @@ function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: a
                               }}
                             >
                               <FiMaximize2 />
-                            </Button>
-                            <Button
-                              size="xs"
-                              variant="solid"
-                              bg="white"
-                              color="gray.700"
-                              borderRadius="full"
-                              shadow="lg"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                console.log('Share related item:', relatedItem.id)
-                              }}
-                            >
-                              <FiShare2 />
                             </Button>
                           </HStack>
 
@@ -923,12 +1013,6 @@ function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: a
                               onClick={(e) => {
                                 e.stopPropagation()
                               }}
-                              onMouseDown={(e) => {
-                                e.stopPropagation()
-                              }}
-                              onPointerDown={(e) => {
-                                e.stopPropagation()
-                              }}
                             >
                               <ItemActionsMenu item={relatedItem} inModal={true} />
                             </Box>
@@ -942,7 +1026,7 @@ function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: a
           )}
 
           {/* Show message if no related images */}
-          {rightSideImages.length === 0 && bottomImages.length === 0 && (
+          {relatedImages.length === 0 && (
             <Box
               bg="white"
               borderRadius="2xl"
@@ -1113,16 +1197,20 @@ function InlineImageDetails({ selectedItem, setSelectedItem }: { selectedItem: a
               >
                 <Button
                   size="sm"
-                  colorScheme="red"
+                  colorScheme={isItemInFavorites(fullscreenItem.collection_id) ? "gray" : "red"}
                   borderRadius="full"
                   shadow="xl"
+                  loading={isSavingItem}
                   onClick={(e) => {
                     e.stopPropagation()
-                    console.log('Save fullscreen item:', fullscreenItem.id)
+                    saveItemMutation.mutate({
+                      itemId: fullscreenItem.id,
+                      isSaved: isItemInFavorites(fullscreenItem.collection_id)
+                    })
                   }}
                 >
                   <FiBookmark style={{ marginRight: '4px' }} />
-                  Save
+                  {isItemInFavorites(fullscreenItem.collection_id) ? "Saved" : "Save"}
                 </Button>
                 <Button
                   size="sm"
@@ -1161,7 +1249,7 @@ function Items() {
   return (
     <Container maxW="full" px={{ base: 4, md: 6, lg: 8 }}> {/* Increased padding for better spacing */}
       <Heading size="lg" pt={12}>
-        Gallery Dashboard
+        Gallery
       </Heading>
       
       {/* Inline Image Details at the top */}
